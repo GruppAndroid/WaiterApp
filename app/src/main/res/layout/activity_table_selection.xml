@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <!-- ============== HEADER ============== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background">
+
+        <!-- Logga -->
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="122dp"
+            android:layout_height="95dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginVertical="16dp"
+            android:src="@drawable/logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Titeltext i headern -->
+        <TextView
+            android:id="@+id/headerTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="Servering Bord"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/logoImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/logoImageView"
+            app:layout_constraintBottom_toBottomOf="@id/logoImageView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ============== INNEHÅLL (centrerat) ============== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- GridLayout för 8 bordsknappar (2 rader x 4 kolumner) -->
+        <GridLayout
+            android:id="@+id/tableGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:rowCount="2"
+            android:alignmentMode="alignMargins"
+            android:useDefaultMargins="true">
+
+            <!-- Bord 1 -->
+            <Button
+                android:id="@+id/btnTable1"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="1"
+                android:background="@drawable/gradient_background"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 2 -->
+            <Button
+                android:id="@+id/btnTable2"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="2"
+                android:background="@drawable/gradient_background"
+
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 3 -->
+            <Button
+                android:id="@+id/btnTable3"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="3"
+                android:background="@drawable/gradient_background"
+
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 4 -->
+            <Button
+                android:id="@+id/btnTable4"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="4"
+                android:background="@drawable/gradient_background"
+
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 5 -->
+            <Button
+                android:id="@+id/btnTable5"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="5"
+                android:background="@drawable/gradient_background"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 6 -->
+            <Button
+                android:id="@+id/btnTable6"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="6"
+                android:background="@drawable/gradient_background"
+
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+            <!-- Bord 7 -->
+            <Button
+                android:id="@+id/btnTable7"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="7"
+                android:background="@drawable/gradient_background"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+
+
+            <!-- Bord 8 -->
+            <Button
+                android:id="@+id/btnTable8"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="8"
+                android:background="@drawable/gradient_background"
+
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+        </GridLayout>
+
+        <!-- Knapp för att göra beställning (under bordsknapparna) -->
+        <Button
+            android:id="@+id/btnPlaceOrder"
+            android:layout_width="531dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="116dp"
+            android:background="@drawable/gradient_background"
+            android:padding="12dp"
+            android:text="Lägg beställning"
+            android:textSize="50sp" />
+    </LinearLayout>
+
+    <!-- ============== FOOTER ============== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/footerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background">
+
+        <TextView
+            android:id="@+id/footerTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="45dp"
+            android:layout_marginVertical="16dp"
+            android:gravity="center"
+            android:text="Antons Skafferi"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
