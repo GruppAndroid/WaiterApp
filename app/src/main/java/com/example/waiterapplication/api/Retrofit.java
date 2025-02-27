@@ -2,11 +2,11 @@ package com.example.waiterapplication.api;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Retrofit {
-    // Uppdatera BASE_URL med kökets serveradress
-    private static final String BASE_URL = "http://kitchen-server-address:8080/";
+    private static final String BASE_URL = "http://10.0.2.2:8080";
     private static Retrofit instance;
     private retrofit2.Retrofit retrofit;
 

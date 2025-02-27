@@ -9,6 +9,9 @@ import retrofit2.http.POST;
 
 public interface ApiService {
 
+    @POST("/api/orders")
+    Call<List<TakeOrder>> sendOrder(@Body List<TakeOrder> orders);
+
     @POST("kitchen/order")
     Call<TakeOrder> sendOrder(@Body TakeOrder order);
 

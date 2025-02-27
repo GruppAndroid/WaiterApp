@@ -27,6 +27,7 @@
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <!-- Titeltext i headern -->
+
         <TextView
             android:id="@+id/headerTextView"
             android:layout_width="0dp"
@@ -34,13 +35,27 @@
             android:layout_marginHorizontal="16dp"
             android:gravity="center_vertical"
             android:text="Servering Bord"
-            android:textColor="#3F51B5"
+            android:textColor="#F2EDED"
             android:textSize="50sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/logoImageView"
+            app:layout_constraintBottom_toBottomOf="@id/logoImageView"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/logoImageView"
             app:layout_constraintTop_toTopOf="@id/logoImageView"
-            app:layout_constraintBottom_toBottomOf="@id/logoImageView"/>
+            app:layout_constraintVertical_bias="0.9" />
+
+        <TextView
+            android:id="@+id/tvTableNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bord "
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/headerTextView"
+            android:layout_margin="16dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

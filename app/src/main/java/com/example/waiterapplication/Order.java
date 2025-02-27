@@ -1,5 +1,6 @@
 package com.example.waiterapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.example.waiterapplication.api.ApiService;
 import com.example.waiterapplication.api.Retrofit;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -21,11 +23,8 @@ import retrofit2.Response;
 
 public class Order extends AppCompatActivity {
 
-    // NumberPickers för förrätter
     NumberPicker npAppetizer1, npAppetizer2, npAppetizer3;
-    // NumberPickers för huvudrätter
     NumberPicker npMain1, npMain2, npMain3;
-    // NumberPickers för efterrätter
     NumberPicker npDessert1, npDessert2, npDessert3;
 
     TextView tvTableNumber;
@@ -33,12 +32,18 @@ public class Order extends AppCompatActivity {
     List<TakeOrder> orders = new ArrayList<>();
     private ApiService apiService;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+        tvTableNumber = findViewById(R.id.tvTableNumber);
+
         String tableNumber = getIntent().getStringExtra("TABLE_NUMBER");
+        if (tableNumber != null) {
+            tvTableNumber.setText(tableNumber);
+        }
 
         npAppetizer1 = findViewById(R.id.npAppetizer1);
         npAppetizer2 = findViewById(R.id.npAppetizer2);
@@ -51,31 +56,20 @@ public class Order extends AppCompatActivity {
         npDessert3 = findViewById(R.id.npDessert3);
         btnSubmitOrder = findViewById(R.id.btnSubmitOrder);
 
-        if (tvTableNumber != null && tableNumber != null) {
-            tvTableNumber.setText(tableNumber);
-        }
+        configureNumberPickers();
 
-        configNumberPicker(npAppetizer1);
-        configNumberPicker(npAppetizer2);
-        configNumberPicker(npAppetizer3);
-        configNumberPicker(npMain1);
-        configNumberPicker(npMain2);
-        configNumberPicker(npMain3);
-        configNumberPicker(npDessert1);
-        configNumberPicker(npDessert2);
-        configNumberPicker(npDessert3);
-
-        // Använd den uppdaterade Retrofit-instansen för kökskommunikation
         apiService = Retrofit.getInstance().getApi();
     }
 
-    private void configNumberPicker(NumberPicker picker) {
-        picker.setMinValue(0);
-        picker.setMaxValue(9);
-        picker.setWrapSelectorWheel(true);
+    private void configureNumberPickers() {
+        List<NumberPicker> pickers = Arrays.asList(npAppetizer1, npAppetizer2, npAppetizer3, npMain1, npMain2, npMain3, npDessert1, npDessert2, npDessert3);
+        for (NumberPicker picker : pickers) {
+            picker.setMinValue(0);
+            picker.setMaxValue(9);
+            picker.setWrapSelectorWheel(true);
+        }
     }
 
-    // Metod kopplad via XML: android:onClick="sendOrder"
     public void sendOrder(View view) {
         orders.clear();
 
@@ -86,49 +80,27 @@ public class Order extends AppCompatActivity {
         }
         int tableInt = Integer.parseInt(tableNumber);
 
-        // Läs av antal valda för varje NumberPicker
         int qtyApp1 = npAppetizer1.getValue();
         int qtyApp2 = npAppetizer2.getValue();
         int qtyApp3 = npAppetizer3.getValue();
-
         int qtyMain1 = npMain1.getValue();
         int qtyMain2 = npMain2.getValue();
         int qtyMain3 = npMain3.getValue();
-
         int qtyDess1 = npDessert1.getValue();
         int qtyDess2 = npDessert2.getValue();
         int qtyDess3 = npDessert3.getValue();
 
-        // Skapa beställningar endast om kvantiteten är > 0
-        if (qtyApp1 > 0) {
-            orders.add(createOrder("Appetizer", "Prawn Chips", tableInt));
-        }
-        if (qtyApp2 > 0) {
-            orders.add(createOrder("Appetizer", "Garlic Bread", tableInt));
-        }
-        if (qtyApp3 > 0) {
-            orders.add(createOrder("Appetizer", "Baked Parmesan Tomato", tableInt));
-        }
+        if (qtyApp1 > 0) orders.add(createOrder("Appetizer", "Prawn Chips", tableInt));
+        if (qtyApp2 > 0) orders.add(createOrder("Appetizer", "Garlic Bread", tableInt));
+        if (qtyApp3 > 0) orders.add(createOrder("Appetizer", "Baked Parmesan Tomato", tableInt));
 
-        if (qtyMain1 > 0) {
-            orders.add(createOrder("MainDish", "Smoked Salmon", tableInt));
-        }
-        if (qtyMain2 > 0) {
-            orders.add(createOrder("MainDish", "Fish and Chips", tableInt));
-        }
-        if (qtyMain3 > 0) {
-            orders.add(createOrder("MainDish", "Extreme Burger", tableInt));
-        }
+        if (qtyMain1 > 0) orders.add(createOrder("MainDish", "Smoked Salmon", tableInt));
+        if (qtyMain2 > 0) orders.add(createOrder("MainDish", "Fish and Chips", tableInt));
+        if (qtyMain3 > 0) orders.add(createOrder("MainDish", "Extreme Burger", tableInt));
 
-        if (qtyDess1 > 0) {
-            orders.add(createOrder("Dessert", "Pudding", tableInt));
-        }
-        if (qtyDess2 > 0) {
-            orders.add(createOrder("Dessert", "Ice Cream", tableInt));
-        }
-        if (qtyDess3 > 0) {
-            orders.add(createOrder("Dessert", "Apple Pie", tableInt));
-        }
+        if (qtyDess1 > 0) orders.add(createOrder("Dessert", "Pudding", tableInt));
+        if (qtyDess2 > 0) orders.add(createOrder("Dessert", "Ice Cream", tableInt));
+        if (qtyDess3 > 0) orders.add(createOrder("Dessert", "Apple Pie", tableInt));
 
         if (orders.isEmpty()) {
             Toast.makeText(this, "No dishes selected!", Toast.LENGTH_SHORT).show();
@@ -136,7 +108,6 @@ public class Order extends AppCompatActivity {
         }
 
         sendOrderToServer();
-        startActivity(new Intent(this, MainActivity.class));
     }
 
     private TakeOrder createOrder(String category, String meal, int table) {
@@ -150,30 +121,28 @@ public class Order extends AppCompatActivity {
     }
 
     private void sendOrderToServer() {
-        for (TakeOrder order : orders) {
-            Call<TakeOrder> call = apiService.sendOrder(order);
-            call.enqueue(new Callback<TakeOrder>() {
-                @Override
-                public void onResponse(Call<TakeOrder> call, Response<TakeOrder> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(Order.this, "Order sent successfully!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(Order.this, "Failed to send order: " + response.message(), Toast.LENGTH_SHORT).show();
-                    }
-                }
 
-                @Override
-                public void onFailure(Call<TakeOrder> call, Throwable t) {
-                    Toast.makeText(Order.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+        Call<List<TakeOrder>> call = apiService.sendOrder(orders);
+        call.enqueue(new Callback<List<TakeOrder>>() {
+            @Override
+            public void onResponse(Call<List<TakeOrder>> call, Response<List<TakeOrder>> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(Order.this, "All orders sent successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Order.this, "Failed to send orders: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
-            });
-        }
-        orders.clear();
+            }
+
+            @Override
+            public void onFailure(Call<List<TakeOrder>> call, Throwable t) {
+                Toast.makeText(Order.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public String getCurrentTime() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         return dateFormat.format(calendar.getTime());
     }
 }

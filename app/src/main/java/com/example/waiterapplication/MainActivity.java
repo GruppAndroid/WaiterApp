@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startOrderActivity(String tableNumber) {
-        Intent intent = new Intent(this, Order.class);
+        Intent intent = new Intent(MainActivity.this, Order.class);
         intent.putExtra("TABLE_NUMBER", tableNumber);
         startActivity(intent);
     }

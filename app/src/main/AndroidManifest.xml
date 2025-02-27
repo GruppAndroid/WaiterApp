@@ -26,12 +26,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
 
-        <!-- Booking activity -->
-        <activity
-            android:name=".Booking"
-            android:exported="false" />
+        <activity android:name=".Order"></activity>
 
     </application>
 
