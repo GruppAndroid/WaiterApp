@@ -1,41 +1,29 @@
 package com.example.waiterapplication;
-
+import com.example.waiterapplication.OrderSpecs;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TakeOrder {
 
-    @SerializedName("tableNr")
+    @SerializedName("tableNumber")
     private int table;
 
-    @SerializedName("category")
-    private String category;
+    @SerializedName("orderSpecs")
+    List<OrderSpecs> orderSpecs;
 
-    @SerializedName("meal")
-    private String meal;
 
-    @SerializedName("time")
-    private String time;
+    @SerializedName("isFinished")
+    private Boolean complete;
 
-    @SerializedName("complete")
-    private String complete;
-
+    public TakeOrder(){ orderSpecs = new ArrayList<>();}
     public int getTable() {
         return table;
     }
 
-    public String getCategory() {
-        return category;
-    }
 
-    public String getMeal() {
-        return meal;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getComplete() {
+    public Boolean getComplete() {
         return complete;
     }
 
@@ -43,19 +31,10 @@ public class TakeOrder {
         this.table = table;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setMeal(String meal) {
-        this.meal = meal;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public void setComplete(String complete) {
+    public void setComplete(Boolean complete) {
         this.complete = complete;
+    }
+    public void addOrderSpec(OrderSpecs orderspec){
+        orderSpecs.add(orderspec);
     }
 }

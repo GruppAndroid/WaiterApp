@@ -1,6 +1,5 @@
 package com.example.waiterapplication;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import retrofit2.Call;
@@ -23,28 +23,24 @@ import retrofit2.Response;
 
 public class Order extends AppCompatActivity {
 
+    // NumberPickers för rätter
     NumberPicker npAppetizer1, npAppetizer2, npAppetizer3;
     NumberPicker npMain1, npMain2, npMain3;
     NumberPicker npDessert1, npDessert2, npDessert3;
 
+    // TextView för att visa valt bord (finns i headern i din layout)
     TextView tvTableNumber;
     Button btnSubmitOrder;
     List<TakeOrder> orders = new ArrayList<>();
     private ApiService apiService;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order);
+        setContentView(R.layout.activity_order); // Se till att filnamnet stämmer
 
+        // Initiera vyerna
         tvTableNumber = findViewById(R.id.tvTableNumber);
-
-        String tableNumber = getIntent().getStringExtra("TABLE_NUMBER");
-        if (tableNumber != null) {
-            tvTableNumber.setText(tableNumber);
-        }
-
         npAppetizer1 = findViewById(R.id.npAppetizer1);
         npAppetizer2 = findViewById(R.id.npAppetizer2);
         npAppetizer3 = findViewById(R.id.npAppetizer3);
@@ -56,93 +52,106 @@ public class Order extends AppCompatActivity {
         npDessert3 = findViewById(R.id.npDessert3);
         btnSubmitOrder = findViewById(R.id.btnSubmitOrder);
 
-        configureNumberPickers();
+        // Hämta bordnummer från Intent och visa det (t.ex. "Bord: 3")
+        String tableNumber = getIntent().getStringExtra("TABLE_NUMBER");
+        if (tableNumber != null) {
+            tvTableNumber.setText("Bord: " + tableNumber);
+        }
 
+        // Konfigurera NumberPickers
+        configNumberPicker(npAppetizer1);
+        configNumberPicker(npAppetizer2);
+        configNumberPicker(npAppetizer3);
+        configNumberPicker(npMain1);
+        configNumberPicker(npMain2);
+        configNumberPicker(npMain3);
+        configNumberPicker(npDessert1);
+        configNumberPicker(npDessert2);
+        configNumberPicker(npDessert3);
+
+        // Hämta Retrofit-instansen för API-anrop
         apiService = Retrofit.getInstance().getApi();
     }
 
-    private void configureNumberPickers() {
-        List<NumberPicker> pickers = Arrays.asList(npAppetizer1, npAppetizer2, npAppetizer3, npMain1, npMain2, npMain3, npDessert1, npDessert2, npDessert3);
-        for (NumberPicker picker : pickers) {
-            picker.setMinValue(0);
-            picker.setMaxValue(9);
-            picker.setWrapSelectorWheel(true);
-        }
+    private void configNumberPicker(NumberPicker picker) {
+        picker.setMinValue(0);
+        picker.setMaxValue(9);
+        picker.setWrapSelectorWheel(true);
     }
 
+    // Anropas via android:onClick="sendOrder" i layouten
     public void sendOrder(View view) {
         orders.clear();
 
-        String tableNumber = tvTableNumber.getText().toString().trim();
-        if (tableNumber.isEmpty()) {
-            Toast.makeText(this, "Table number is missing!", Toast.LENGTH_SHORT).show();
+        String tableText = tvTableNumber.getText().toString();
+        if (tableText.isEmpty()) {
+            Toast.makeText(this, "Bordnummer saknas!", Toast.LENGTH_SHORT).show();
             return;
         }
-        int tableInt = Integer.parseInt(tableNumber);
+        // Extrahera själva nummerdelen från texten ("Bord: 3" -> "3")
+        int tableInt = Integer.parseInt(tableText.replaceAll("[^0-9]", ""));
 
-        int qtyApp1 = npAppetizer1.getValue();
-        int qtyApp2 = npAppetizer2.getValue();
-        int qtyApp3 = npAppetizer3.getValue();
-        int qtyMain1 = npMain1.getValue();
-        int qtyMain2 = npMain2.getValue();
-        int qtyMain3 = npMain3.getValue();
-        int qtyDess1 = npDessert1.getValue();
-        int qtyDess2 = npDessert2.getValue();
-        int qtyDess3 = npDessert3.getValue();
+        // Läs antal valda för varje NumberPicker
+        List<Integer> vals = new ArrayList<>();
+        vals.add(npAppetizer1.getValue());
+        vals.add(npAppetizer2.getValue());
+        vals.add(npAppetizer3.getValue());
+        vals.add(npMain1.getValue());
+        vals.add(npMain2.getValue());
+        vals.add(npMain3.getValue());
+        vals.add(npDessert1.getValue());
+        vals.add(npDessert2.getValue());
+        vals.add(npDessert3.getValue());
+        List<String> cat = Arrays.asList("Förrätt", "Huvudrätt", "Efterrätt");
+        List<String> avail_meals = Arrays.asList("Prawn Chips",
+                                                 "Garlic Bread",
+                                                 "Baked Parmesan Tomato",
+                                                 "Smoked Salmon",
+                                                 "Fish and Chips","Extreme Burger",
+                                                 "Pudding","Ice cream","Apple Pie");
 
-        if (qtyApp1 > 0) orders.add(createOrder("Appetizer", "Prawn Chips", tableInt));
-        if (qtyApp2 > 0) orders.add(createOrder("Appetizer", "Garlic Bread", tableInt));
-        if (qtyApp3 > 0) orders.add(createOrder("Appetizer", "Baked Parmesan Tomato", tableInt));
+        Boolean isEmpty=true;
 
-        if (qtyMain1 > 0) orders.add(createOrder("MainDish", "Smoked Salmon", tableInt));
-        if (qtyMain2 > 0) orders.add(createOrder("MainDish", "Fish and Chips", tableInt));
-        if (qtyMain3 > 0) orders.add(createOrder("MainDish", "Extreme Burger", tableInt));
-
-        if (qtyDess1 > 0) orders.add(createOrder("Dessert", "Pudding", tableInt));
-        if (qtyDess2 > 0) orders.add(createOrder("Dessert", "Ice Cream", tableInt));
-        if (qtyDess3 > 0) orders.add(createOrder("Dessert", "Apple Pie", tableInt));
-
-        if (orders.isEmpty()) {
-            Toast.makeText(this, "No dishes selected!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        sendOrderToServer();
-    }
-
-    private TakeOrder createOrder(String category, String meal, int table) {
         TakeOrder order = new TakeOrder();
-        order.setCategory(category);
-        order.setMeal(meal);
-        order.setComplete("False");
-        order.setTable(table);
-        order.setTime(getCurrentTime());
-        return order;
-    }
-
-    private void sendOrderToServer() {
-
-        Call<List<TakeOrder>> call = apiService.sendOrder(orders);
-        call.enqueue(new Callback<List<TakeOrder>>() {
+        order.setTable(tableInt);
+        for(Integer i = 0; i<vals.size();i++){
+            if(vals.get(i)>0){
+                OrderSpecs meals = new OrderSpecs();
+                meals.setCategory(cat.get(i/3));
+                meals.setMeal(avail_meals.get(i));
+                meals.setCount(vals.get(i));
+                order.addOrderSpec(meals);
+                isEmpty=false;
+            }
+        }
+        order.setComplete(false);
+        if (isEmpty) {
+            Toast.makeText(this, "Inga rätter valda!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        vals.clear();
+        Call<TakeOrder> call = apiService.sendOrder(order);
+        call.enqueue(new Callback<TakeOrder>() {
             @Override
-            public void onResponse(Call<List<TakeOrder>> call, Response<List<TakeOrder>> response) {
+            public void onResponse(Call<TakeOrder> call, Response<TakeOrder> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(Order.this, "All orders sent successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Order.this, "Order skickad!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(Order.this, tableInt, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(Order.this, MainActivity.class));
                 } else {
-                    Toast.makeText(Order.this, "Failed to send orders: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Order.this, "Kunde inte skicka order: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
-            public void onFailure(Call<List<TakeOrder>> call, Throwable t) {
-                Toast.makeText(Order.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<TakeOrder> call, Throwable t) {
+                Toast.makeText(Order.this, "Fel: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     public String getCurrentTime() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return dateFormat.format(calendar.getTime());
     }
 }

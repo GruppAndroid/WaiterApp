@@ -10,6 +10,7 @@ public class Retrofit {
     private static Retrofit instance;
     private retrofit2.Retrofit retrofit;
 
+
     private Retrofit() {
         // Skapa logging interceptor
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();

@@ -7,14 +7,12 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- ==================== HEADER ==================== -->
+    <!-- Header med logo, titel och bordnummer (tvTableNumber från första layouten) -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_background">
 
-        <!-- Exempel på logga -->
         <ImageView
             android:id="@+id/logoImageView"
             android:layout_width="122dp"
@@ -22,34 +20,32 @@
             android:layout_marginStart="16dp"
             android:layout_marginVertical="16dp"
             android:src="@drawable/logo"
+            android:contentDescription="Company logo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <!-- Titeltext i headern -->
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/headerTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:text="Servering Bord"
-            android:textColor="#F2EDED"
+            android:textColor="#3F51B5"
             android:textSize="50sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/logoImageView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginHorizontal="16dp"
             app:layout_constraintStart_toEndOf="@id/logoImageView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/logoImageView"
-            app:layout_constraintVertical_bias="0.9" />
+            app:layout_constraintBottom_toBottomOf="@id/logoImageView"/>
 
+        <!-- Bordnummer (id från första layouten) -->
         <TextView
             android:id="@+id/tvTableNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bord "
+            android:text="Bord: "
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/black"
@@ -58,8 +54,7 @@
             android:layout_margin="16dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <!-- ==================== SCROLLVIEW för kategorier ==================== -->
+    <!-- Main Content: Innehållet från den första layouten med kategorier och NumberPickers -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -71,7 +66,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- =============== FÖRRÄTTER =============== -->
+            <!-- Förrätter -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,14 +82,12 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Prawn Chips"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npAppetizer1"
                     android:layout_width="wrap_content"
@@ -108,14 +101,12 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Garlic Bread"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npAppetizer2"
                     android:layout_width="wrap_content"
@@ -129,22 +120,19 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Baked Parmesan Tomato"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npAppetizer3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-
-            <!-- =============== HUVUDRÄTTER =============== -->
+            <!-- Huvudrätter -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -161,14 +149,12 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Smoked Salmon"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npMain1"
                     android:layout_width="wrap_content"
@@ -181,16 +167,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Fish and Chips"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npMain2"
                     android:layout_width="wrap_content"
@@ -204,22 +187,19 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Extreme Burger"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npMain3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-
-            <!-- =============== EFTERRÄTTER =============== -->
+            <!-- Efterrätter -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -236,14 +216,12 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Pudding"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npDessert1"
                     android:layout_width="wrap_content"
@@ -257,14 +235,12 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Ice Cream"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npDessert2"
                     android:layout_width="wrap_content"
@@ -278,35 +254,34 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Apple Pie"
                     android:textSize="18sp" />
-
                 <NumberPicker
                     android:id="@+id/npDessert3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- ==================== LITEN "SKICKA" KNAPP ==================== -->
+    <!-- Knapp för att skicka beställningen (id från första layouten) -->
     <Button
         android:id="@+id/btnSubmitOrder"
-        android:layout_width="259dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="16dp"
-        android:background="@drawable/gradient_background"
-        android:onClick="sendOrder"
         android:text="Skicka"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:background="@drawable/gradient_background"
+        android:onClick="sendOrder" />
 
-    <!-- ==================== FOOTER ==================== -->
+    <!-- Footer -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/footerContainer"
         android:layout_width="match_parent"
@@ -318,7 +293,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="45dp"
-            android:layout_marginVertical="16dp"
             android:gravity="center"
             android:text="Antons Skafferi"
             android:textColor="#fff"
