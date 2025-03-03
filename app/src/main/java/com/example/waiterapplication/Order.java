@@ -2,6 +2,7 @@ package com.example.waiterapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
@@ -136,16 +137,23 @@ public class Order extends AppCompatActivity {
             public void onResponse(Call<TakeOrder> call, Response<TakeOrder> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(Order.this, "Order skickad!", Toast.LENGTH_SHORT).show();
-                    //Toast.makeText(Order.this, tableInt, Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(Order.this, MainActivity.class));
                 } else {
-                    Toast.makeText(Order.this, "Kunde inte skicka order: " + response.code(), Toast.LENGTH_SHORT).show();
+                    try {
+                        String errorBody = response.errorBody().string();
+                        Toast.makeText(Order.this, "Kunde inte skicka order: " + response.code() + " " + errorBody, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(Order.this, "Fel vid hämtning av errorBody", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
+
             @Override
             public void onFailure(Call<TakeOrder> call, Throwable t) {
-                Toast.makeText(Order.this, "Fel: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_ERROR", "Fel vid API-anrop", t);
+                Toast.makeText(Order.this, "Fel: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
+
         });
     }
 
