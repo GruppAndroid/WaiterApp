@@ -20,8 +20,14 @@ public interface ApiService {
     Call<List<TakeOrder>> getReadyOrders();
 
     // Markera en order som levererad
-    @PUT("api/waiter/orders/{tableNumber}/delivered")
+    @PUT("api/kitchen/orders/{tableNumber}/delivered")
     Call<Void> markOrderDelivered(@Path("tableNumber") int tableNumber);
+
+
+
+
+
+
 
     // som ska göras imorgon
     // gör en ny request som ska skicka till serven

@@ -1,6 +1,8 @@
 package com.example.waiterapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +42,7 @@ public class ReadyOrdersAdapter extends RecyclerView.Adapter<ReadyOrdersAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReadyOrdersAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ReadyOrdersAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         TakeOrder order = orderList.get(position);
         holder.tvTableNumber.setText("Bord: " + order.getTable());
 
@@ -57,6 +59,7 @@ public class ReadyOrdersAdapter extends RecyclerView.Adapter<ReadyOrdersAdapter.
             }
         }
         holder.tvOrderDetails.setText(details.toString());
+        Log.d("API_REQUEST", "Försöker markera order som levererad för bord: " + order.getTable());
 
         // När användaren trycker på knappen, markera ordern som levererad
         holder.btnDelivered.setOnClickListener(v -> {
@@ -70,6 +73,9 @@ public class ReadyOrdersAdapter extends RecyclerView.Adapter<ReadyOrdersAdapter.
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, orderList.size());
                     } else {
+                        //för att se villken API fel det är
+                        Log.e("API_ERROR", "Statuskod: " + response.code() + " | Meddelande: " + response.message());
+
                         Toast.makeText(context, "Kunde inte uppdatera ordern", Toast.LENGTH_SHORT).show();
                     }
                 }
