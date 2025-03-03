@@ -12,6 +12,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Referenser till bords-knapparna
     Button b1, b2, b3, b4, b5, b6, b7, b8;
+    // Ny knapp för att visa färdiga ordrar
+    Button btnShowReadyOrders;
     private ApiService apiService;
 
     @Override
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table_selection); // Kontrollera att layoutfilens namn stämmer
 
-        // Initiera knapparna
+        // Initiera bords-knapparna
         b1 = findViewById(R.id.btnTable1);
         b2 = findViewById(R.id.btnTable2);
         b3 = findViewById(R.id.btnTable3);
@@ -29,7 +31,19 @@ public class MainActivity extends AppCompatActivity {
         b7 = findViewById(R.id.btnTable7);
         b8 = findViewById(R.id.btnTable8);
 
+        // Initiera knappen för att visa färdiga ordrar
+        btnShowReadyOrders = findViewById(R.id.btnShowReadyOrders);
+
         apiService = Retrofit.getInstance().getApi();
+
+        btnShowReadyOrders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Öppna aktiviteten som visar färdiga ordrar
+                Intent intent = new Intent(MainActivity.this, ReadyOrdersActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     // Dessa metoder anropas via android:onClick i din layout

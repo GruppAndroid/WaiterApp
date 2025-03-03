@@ -37,4 +37,9 @@ public class TakeOrder {
     public void addOrderSpec(OrderSpecs orderspec){
         orderSpecs.add(orderspec);
     }
+
+    public List<OrderSpecs> getOrderSpecs() {
+        return orderSpecs;
+    }
+
 }

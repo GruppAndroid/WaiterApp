@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Servering Bord"
+            android:text="Servera ett Bord"
             android:textColor="#3F51B5"
             android:textSize="50sp"
             android:textStyle="bold"
@@ -51,7 +51,7 @@
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/headerTextView"
-            android:layout_margin="16dp"/>
+            android:layout_margin="26dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Main Content: Innehållet från den första layouten med kategorier och NumberPickers -->
@@ -294,7 +294,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="45dp"
             android:gravity="center"
-            android:text="Antons Skafferi"
+            android:text="Välkommen till Antons Skafferi"
             android:textColor="#fff"
             android:textSize="24sp"
             android:textStyle="bold"

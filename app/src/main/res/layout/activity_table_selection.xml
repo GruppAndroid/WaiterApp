@@ -33,7 +33,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:text="Servering Bord"
+            android:text="Servera ett Bord"
             android:gravity="center"
             android:textColor="#fff"
             android:textSize="28sp"
@@ -160,8 +160,22 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:onClick="tableEight" />
+
+
         </GridLayout>
+
+        <Button
+            android:id="@+id/btnShowReadyOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="73dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_button"
+            android:text="Visa färdiga beställningar"
+            android:textSize="20dp"
+            android:textStyle="bold" />
     </LinearLayout>
+
+
 
     <!-- ============== FOOTER ============== -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -176,7 +190,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:gravity="center"
-            android:text="Antons Skafferi"
+            android:text="Välkommen till Antons Skafferi"
             android:textColor="#fff"
             android:textSize="22sp"
             android:textStyle="bold"
