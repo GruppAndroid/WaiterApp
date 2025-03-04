@@ -5,9 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Titel för sidan -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Färdiga Ordrar"
+        android:textColor="@color/black"
+        android:background="@drawable/gradient_background"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="16dp"/>
+
     <!-- RecyclerView för att visa färdiga ordrar -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewReadyOrders"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
 </LinearLayout>

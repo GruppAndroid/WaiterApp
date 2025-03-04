@@ -8,16 +8,19 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.waiterapplication.api.ApiService;
 import com.example.waiterapplication.api.Retrofit;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -84,15 +87,16 @@ public class Order extends AppCompatActivity {
     public void sendOrder(View view) {
         orders.clear();
 
+        // 1. Kolla att vi har ett bordnummer
         String tableText = tvTableNumber.getText().toString();
         if (tableText.isEmpty()) {
             Toast.makeText(this, "Bordnummer saknas!", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Extrahera själva nummerdelen från texten ("Bord: 3" -> "3")
+        // Extrahera siffra ("Bord: 3" -> "3")
         int tableInt = Integer.parseInt(tableText.replaceAll("[^0-9]", ""));
 
-        // Läs antal valda för varje NumberPicker
+        // 2. Läs antal valda för varje NumberPicker
         List<Integer> vals = new ArrayList<>();
         vals.add(npAppetizer1.getValue());
         vals.add(npAppetizer2.getValue());
@@ -103,34 +107,58 @@ public class Order extends AppCompatActivity {
         vals.add(npDessert1.getValue());
         vals.add(npDessert2.getValue());
         vals.add(npDessert3.getValue());
+
+        // 3. Summera valen per kategori
+        int totalAppetizers = npAppetizer1.getValue() + npAppetizer2.getValue() + npAppetizer3.getValue();
+        int totalMains      = npMain1.getValue() + npMain2.getValue() + npMain3.getValue();
+        int totalDesserts   = npDessert1.getValue() + npDessert2.getValue() + npDessert3.getValue();
+
+        // 4. Kontrollera hur många kategorier som valts
+        int categoriesChosen = 0;
+        if (totalAppetizers > 0) categoriesChosen++;
+        if (totalMains > 0) categoriesChosen++;
+        if (totalDesserts > 0) categoriesChosen++;
+
+        if (categoriesChosen == 0) {
+            Toast.makeText(this, "Välj minst en rätt i en kategori!", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (categoriesChosen > 1) {
+            Toast.makeText(this, "Endast EN kategori åt gången är tillåtet!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 5. Bygg ordern endast om exakt en kategori är vald
         List<String> cat = Arrays.asList("Förrätt", "Huvudrätt", "Efterrätt");
-        List<String> avail_meals = Arrays.asList("Prawn Chips",
-                                                 "Garlic Bread",
-                                                 "Baked Parmesan Tomato",
-                                                 "Smoked Salmon",
-                                                 "Fish and Chips","Extreme Burger",
-                                                 "Pudding","Ice cream","Apple Pie");
+        List<String> avail_meals = Arrays.asList(
+                "Prawn Chips", "Garlic Bread", "Baked Parmesan Tomato",
+                "Smoked Salmon", "Fish and Chips", "Extreme Burger",
+                "Pudding", "Ice cream", "Apple Pie"
+        );
 
-        Boolean isEmpty=true;
-
+        Boolean isEmpty = true;
         TakeOrder order = new TakeOrder();
         order.setTable(tableInt);
-        for(Integer i = 0; i<vals.size();i++){
-            if(vals.get(i)>0){
+
+        // Loopar igenom alla 9 NumberPickers
+        for (int i = 0; i < vals.size(); i++) {
+            if (vals.get(i) > 0) {
                 OrderSpecs meals = new OrderSpecs();
-                meals.setCategory(cat.get(i/3));
+                meals.setCategory(cat.get(i / 3));
                 meals.setMeal(avail_meals.get(i));
                 meals.setCount(vals.get(i));
                 order.addOrderSpec(meals);
-                isEmpty=false;
+                isEmpty = false;
             }
         }
+
         order.setComplete(false);
+
         if (isEmpty) {
             Toast.makeText(this, "Inga rätter valda!", Toast.LENGTH_SHORT).show();
             return;
         }
-        vals.clear();
+
+        // 6. Skicka ordern till servern
         Call<TakeOrder> call = apiService.sendOrder(order);
         call.enqueue(new Callback<TakeOrder>() {
             @Override
@@ -153,7 +181,6 @@ public class Order extends AppCompatActivity {
                 Log.e("API_ERROR", "Fel vid API-anrop", t);
                 Toast.makeText(Order.this, "Fel: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
-
         });
     }
 
