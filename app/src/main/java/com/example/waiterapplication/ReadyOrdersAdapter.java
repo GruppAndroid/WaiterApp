@@ -34,6 +34,7 @@ public class ReadyOrdersAdapter extends RecyclerView.Adapter<ReadyOrdersAdapter.
         this.apiService = Retrofit.getInstance().getApi();
     }
 
+
     @NonNull
     @Override
     public ReadyOrdersAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

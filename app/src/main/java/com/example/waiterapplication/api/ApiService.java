@@ -29,6 +29,8 @@ public interface ApiService {
 
 
 
+
+
     // som ska göras imorgon
     // gör en ny request som ska skicka till serven
     // gör en fetch func som gör när man trycker på knappen så att den försvinner
