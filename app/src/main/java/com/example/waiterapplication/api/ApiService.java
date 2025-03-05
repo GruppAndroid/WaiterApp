@@ -2,6 +2,8 @@ package com.example.waiterapplication.api;
 
 import com.example.waiterapplication.TakeOrder;
 import java.util.List;
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -10,6 +12,11 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ApiService {
+
+    // Hämta meny
+    @GET("api/v1/menu")
+    Call<List<Map<String, Object>>> getMenu();
+
 
     // Skicka en order
     @POST("api/kitchen/orders")

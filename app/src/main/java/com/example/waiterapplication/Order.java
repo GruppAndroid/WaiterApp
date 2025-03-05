@@ -1,192 +1,158 @@
 package com.example.waiterapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.waiterapplication.api.ApiService;
 import com.example.waiterapplication.api.Retrofit;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Order extends AppCompatActivity {
-
-    // NumberPickers för rätter
-    NumberPicker npAppetizer1, npAppetizer2, npAppetizer3;
-    NumberPicker npMain1, npMain2, npMain3;
-    NumberPicker npDessert1, npDessert2, npDessert3;
-
-    // TextView för att visa valt bord (finns i headern i din layout)
-    TextView tvTableNumber;
-    Button btnSubmitOrder;
-    List<TakeOrder> orders = new ArrayList<>();
+    private static final String TAG = "Order";
+    private TextView tvTableNumber;
+    private Button btnSubmitOrder;
+    private LinearLayout dishContainer;
     private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order); // Se till att filnamnet stämmer
+        setContentView(R.layout.activity_order);
 
-        // Initiera vyerna
         tvTableNumber = findViewById(R.id.tvTableNumber);
-        npAppetizer1 = findViewById(R.id.npAppetizer1);
-        npAppetizer2 = findViewById(R.id.npAppetizer2);
-        npAppetizer3 = findViewById(R.id.npAppetizer3);
-        npMain1 = findViewById(R.id.npMain1);
-        npMain2 = findViewById(R.id.npMain2);
-        npMain3 = findViewById(R.id.npMain3);
-        npDessert1 = findViewById(R.id.npDessert1);
-        npDessert2 = findViewById(R.id.npDessert2);
-        npDessert3 = findViewById(R.id.npDessert3);
         btnSubmitOrder = findViewById(R.id.btnSubmitOrder);
+        dishContainer = findViewById(R.id.dishContainer);
 
-        // Hämta bordnummer från Intent och visa det (t.ex. "Bord: 3")
+        apiService = Retrofit.getInstance().getApi();
+
         String tableNumber = getIntent().getStringExtra("TABLE_NUMBER");
         if (tableNumber != null) {
             tvTableNumber.setText("Bord: " + tableNumber);
         }
 
-        // Konfigurera NumberPickers
-        configNumberPicker(npAppetizer1);
-        configNumberPicker(npAppetizer2);
-        configNumberPicker(npAppetizer3);
-        configNumberPicker(npMain1);
-        configNumberPicker(npMain2);
-        configNumberPicker(npMain3);
-        configNumberPicker(npDessert1);
-        configNumberPicker(npDessert2);
-        configNumberPicker(npDessert3);
-
-        // Hämta Retrofit-instansen för API-anrop
-        apiService = Retrofit.getInstance().getApi();
+        btnSubmitOrder.setOnClickListener(v -> sendOrder());
+        fetchMenuData();
     }
 
-    private void configNumberPicker(NumberPicker picker) {
-        picker.setMinValue(0);
-        picker.setMaxValue(9);
-        picker.setWrapSelectorWheel(true);
+    private void fetchMenuData() {
+        Call<List<Map<String, Object>>> menuCall = apiService.getMenu();
+        menuCall.enqueue(new Callback<List<Map<String, Object>>>() {
+            @Override
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    updateDishContainer(response.body());
+                } else {
+                    Toast.makeText(Order.this, "Kunde inte hämta menyn", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                Toast.makeText(Order.this, "Fel vid hämtning av meny", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // Anropas via android:onClick="sendOrder" i layouten
-    public void sendOrder(View view) {
-        orders.clear();
+    private void updateDishContainer(List<Map<String, Object>> dishes) {
+        dishContainer.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
 
-        // 1. Kolla att vi har ett bordnummer
-        String tableText = tvTableNumber.getText().toString();
-        if (tableText.isEmpty()) {
-            Toast.makeText(this, "Bordnummer saknas!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        // Extrahera siffra ("Bord: 3" -> "3")
-        int tableInt = Integer.parseInt(tableText.replaceAll("[^0-9]", ""));
+        Map<String, List<Map<String, Object>>> categorizedDishes = new HashMap<>();
+        for (Map<String, Object> dish : dishes) {
+            String category = (String) dish.get("DISH_TYPE_NAME");
+            if (category == null || category.isEmpty()) category = "Okänd kategori";
 
-        // 2. Läs antal valda för varje NumberPicker
-        List<Integer> vals = new ArrayList<>();
-        vals.add(npAppetizer1.getValue());
-        vals.add(npAppetizer2.getValue());
-        vals.add(npAppetizer3.getValue());
-        vals.add(npMain1.getValue());
-        vals.add(npMain2.getValue());
-        vals.add(npMain3.getValue());
-        vals.add(npDessert1.getValue());
-        vals.add(npDessert2.getValue());
-        vals.add(npDessert3.getValue());
-
-        // 3. Summera valen per kategori
-        int totalAppetizers = npAppetizer1.getValue() + npAppetizer2.getValue() + npAppetizer3.getValue();
-        int totalMains      = npMain1.getValue() + npMain2.getValue() + npMain3.getValue();
-        int totalDesserts   = npDessert1.getValue() + npDessert2.getValue() + npDessert3.getValue();
-
-        // 4. Kontrollera hur många kategorier som valts
-        int categoriesChosen = 0;
-        if (totalAppetizers > 0) categoriesChosen++;
-        if (totalMains > 0) categoriesChosen++;
-        if (totalDesserts > 0) categoriesChosen++;
-
-        if (categoriesChosen == 0) {
-            Toast.makeText(this, "Välj minst en rätt i en kategori!", Toast.LENGTH_SHORT).show();
-            return;
-        } else if (categoriesChosen > 1) {
-            Toast.makeText(this, "Endast EN kategori åt gången är tillåtet!", Toast.LENGTH_SHORT).show();
-            return;
+            categorizedDishes.computeIfAbsent(category, k -> new java.util.ArrayList<>()).add(dish);
         }
 
-        // 5. Bygg ordern endast om exakt en kategori är vald
-        List<String> cat = Arrays.asList("Förrätt", "Huvudrätt", "Efterrätt");
-        List<String> avail_meals = Arrays.asList(
-                "Prawn Chips", "Garlic Bread", "Baked Parmesan Tomato",
-                "Smoked Salmon", "Fish and Chips", "Extreme Burger",
-                "Pudding", "Ice cream", "Apple Pie"
-        );
+        for (String category : categorizedDishes.keySet()) {
+            TextView categoryHeader = new TextView(this);
+            categoryHeader.setText(category);
+            categoryHeader.setTextSize(22);
+            categoryHeader.setPadding(0, 20, 0, 10);
+            dishContainer.addView(categoryHeader);
 
-        Boolean isEmpty = true;
+            for (Map<String, Object> dish : categorizedDishes.get(category)) {
+                View dishRow = inflater.inflate(R.layout.dish_row, dishContainer, false);
+
+                TextView dishNameTextView = dishRow.findViewById(R.id.dishNameTextView);
+                NumberPicker dishQuantityPicker = dishRow.findViewById(R.id.dishQuantityPicker);
+
+                dishNameTextView.setText((String) dish.get("DISH_NAME"));
+                dishQuantityPicker.setMinValue(0);
+                dishQuantityPicker.setMaxValue(9);
+                dishQuantityPicker.setWrapSelectorWheel(true);
+                dishRow.setTag(dish);
+                dishContainer.addView(dishRow);
+            }
+        }
+    }
+
+    private void sendOrder() {
+        int childCount = dishContainer.getChildCount();
         TakeOrder order = new TakeOrder();
-        order.setTable(tableInt);
 
-        // Loopar igenom alla 9 NumberPickers
-        for (int i = 0; i < vals.size(); i++) {
-            if (vals.get(i) > 0) {
-                OrderSpecs meals = new OrderSpecs();
-                meals.setCategory(cat.get(i / 3));
-                meals.setMeal(avail_meals.get(i));
-                meals.setCount(vals.get(i));
-                order.addOrderSpec(meals);
-                isEmpty = false;
+        String tableNumberStr = tvTableNumber.getText().toString().replace("Bord: ", "");
+        order.setTable(Integer.parseInt(tableNumberStr));
+        order.setComplete(false);
+
+        boolean hasOrderedItems = false;
+        for (int i = 0; i < childCount; i++) {
+            View dishRow = dishContainer.getChildAt(i);
+
+            if (dishRow instanceof TextView) continue;
+
+            NumberPicker quantityPicker = dishRow.findViewById(R.id.dishQuantityPicker);
+            if (quantityPicker == null) continue;
+
+            int quantity = quantityPicker.getValue();
+            if (quantity > 0) {
+                hasOrderedItems = true;
+                Map<String, Object> dishInfo = (Map<String, Object>) dishRow.getTag();
+                String dishName = (String) dishInfo.get("DISH_NAME");
+                String dishCategory = (String) dishInfo.get("DISH_TYPE_NAME");
+                if (dishCategory == null || dishCategory.isEmpty()) dishCategory = "Okänd kategori";
+
+                OrderSpecs orderSpec = new OrderSpecs();
+                orderSpec.setMeal(dishName);
+                orderSpec.setCategory(dishCategory);
+                orderSpec.setCount(quantity);
+                order.addOrderSpec(orderSpec);
             }
         }
 
-        order.setComplete(false);
-
-        if (isEmpty) {
-            Toast.makeText(this, "Inga rätter valda!", Toast.LENGTH_SHORT).show();
+        if (!hasOrderedItems) {
+            Toast.makeText(this, "Välj minst en rätt!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 6. Skicka ordern till servern
-        Call<TakeOrder> call = apiService.sendOrder(order);
-        call.enqueue(new Callback<TakeOrder>() {
+        apiService.sendOrder(order).enqueue(new Callback<TakeOrder>() {
             @Override
             public void onResponse(Call<TakeOrder> call, Response<TakeOrder> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(Order.this, "Order skickad!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(Order.this, MainActivity.class));
+                    finish();
                 } else {
-                    try {
-                        String errorBody = response.errorBody().string();
-                        Toast.makeText(Order.this, "Kunde inte skicka order: " + response.code() + " " + errorBody, Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        Toast.makeText(Order.this, "Fel vid hämtning av errorBody", Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(Order.this, "Kunde inte skicka order", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TakeOrder> call, Throwable t) {
-                Log.e("API_ERROR", "Fel vid API-anrop", t);
-                Toast.makeText(Order.this, "Fel: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Order.this, "Nätverksfel: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public String getCurrentTime() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        return dateFormat.format(calendar.getTime());
     }
 }
