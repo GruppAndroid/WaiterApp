@@ -5,6 +5,9 @@
     package="com.example.waiterapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Add this permission for audio playback -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:usesCleartextTraffic="true"
@@ -29,8 +32,14 @@
 
         <activity android:name=".Order" />
 
-        <!-- Ny aktivitet för att visa färdiga ordrar -->
+        <!-- Keep only one definition for ReadyOrdersActivity -->
         <activity android:name=".ReadyOrdersActivity" />
+
+        <!-- If you need a separate service, use a different class name -->
+        <!-- <service
+            android:name=".ReadyOrdersService"
+            android:enabled="true"
+            android:exported="false" /> -->
 
     </application>
 </manifest>
