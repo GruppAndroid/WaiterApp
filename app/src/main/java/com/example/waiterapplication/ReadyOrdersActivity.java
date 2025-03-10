@@ -1,12 +1,8 @@
 package com.example.waiterapplication;
 
-import android.content.Context;
-import android.media.MediaPlayer;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -35,7 +31,7 @@ public class ReadyOrdersActivity extends AppCompatActivity {
         @Override
         public void run() {
             fetchReadyOrders();
-            refreshHandler.postDelayed(this, 10000);  // Run every 10 seconds
+            refreshHandler.postDelayed(this, 5000);  // Run every 10 seconds
         }
     };
 
@@ -49,12 +45,17 @@ public class ReadyOrdersActivity extends AppCompatActivity {
 
         apiService = Retrofit.getInstance().getApi();
 
+        // Tell the service this activity is now active
+        OrderMonitorService.setReadyOrdersActivityActive(this, true);
+
         fetchReadyOrders();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Tell the service this activity is now active
+        OrderMonitorService.setReadyOrdersActivityActive(this, true);
         refreshHandler.post(refreshRunnable);
     }
 
@@ -64,6 +65,12 @@ public class ReadyOrdersActivity extends AppCompatActivity {
         refreshHandler.removeCallbacks(refreshRunnable);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Tell the service this activity is now inactive
+        OrderMonitorService.setReadyOrdersActivityActive(this, false);
+    }
 
     private void fetchReadyOrders() {
         apiService.getReadyOrders().enqueue(new Callback<List<TakeOrder>>() {
@@ -73,7 +80,7 @@ public class ReadyOrdersActivity extends AppCompatActivity {
                     List<TakeOrder> newReadyOrders = response.body();
                     Log.d("ReadyOrdersActivity", "Hämtade " + newReadyOrders.size() + " färdiga ordrar från API");
 
-                    // First update the adapter with the new data
+                    // Update the adapter with the new data
                     if (adapter == null) {
                         Log.d("ReadyOrdersActivity", "Skapar ny adapter med " + newReadyOrders.size() + " ordrar");
                         adapter = new ReadyOrdersAdapter(newReadyOrders, ReadyOrdersActivity.this);
@@ -83,19 +90,8 @@ public class ReadyOrdersActivity extends AppCompatActivity {
                         adapter.updateOrders(newReadyOrders);
                     }
 
-                    // Then handle notification logic separately
-                    int currentOrderCount = newReadyOrders.size();
-                    Log.d("ReadyOrdersActivity", "Nuvarande: " + currentOrderCount + ", Tidigare: " + previousOrderCount);
-
-                    if (currentOrderCount > previousOrderCount) {
-                        Log.d("ReadyOrdersActivity", "Nya ordrar upptäckta, spelar notifikation");
-                        playNotificationSound();
-                        vibrate();
-                    }
-
-                    previousOrderCount = currentOrderCount;
-
-                    Log.d("ReadyOrdersActivity", "Antal färdiga ordrar: " + newReadyOrders.size());
+                    // Update previous count (no need to play sound here)
+                    previousOrderCount = newReadyOrders.size();
                 } else {
                     // Don't show toast for no orders, just log it
                     Log.d("ReadyOrdersActivity", "Inga färdiga ordrar hittades eller svarskod: " + response.code());
@@ -116,26 +112,39 @@ public class ReadyOrdersActivity extends AppCompatActivity {
             }
         });
     }
-    // Play notification sound
-    private void playNotificationSound() {
-        try {
-            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.order_ready_sound);
-            mediaPlayer.start();
-            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-        } catch (Exception e) {
-            Log.e("Sound Error", "Could not play notification sound", e);
-        }
+
+    private void markOrderAsDelivered(int orderId) {
+        apiService.markOrderDelivered(orderId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    fetchReadyOrders();  // Uppdatera listan
+                    Toast.makeText(ReadyOrdersActivity.this, "Order markerad som levererad!", Toast.LENGTH_SHORT).show();
+
+                    // Gå tillbaka till huvudmenyn efter leverans
+                    new Handler().postDelayed(() -> {
+                        Intent mainIntent = new Intent(ReadyOrdersActivity.this, MainActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(mainIntent);
+                        finish();
+                    }, 1000);  // Vänta 1 sekund för en bättre upplevelse
+                } else {
+                    Toast.makeText(ReadyOrdersActivity.this, "Misslyckades med att markera som levererad", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ReadyOrdersActivity.this, "Nätverksfel", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // Vibrate the device
-    private void vibrate() {
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                vibrator.vibrate(500);
-            }
-        }
+    public int getPreviousOrderCount() {
+        return previousOrderCount;
+    }
+
+    public void setPreviousOrderCount(int previousOrderCount) {
+        this.previousOrderCount = previousOrderCount;
     }
 }

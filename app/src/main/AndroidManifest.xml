@@ -35,6 +35,8 @@
         <!-- Keep only one definition for ReadyOrdersActivity -->
         <activity android:name=".ReadyOrdersActivity" />
 
+        <service android:name=".OrderMonitorService" />
+
         <!-- If you need a separate service, use a different class name -->
         <!-- <service
             android:name=".ReadyOrdersService"

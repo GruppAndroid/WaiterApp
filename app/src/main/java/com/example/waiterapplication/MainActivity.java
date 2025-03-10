@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Intent serviceIntent = new Intent(this, OrderMonitorService.class);
+        startService(serviceIntent);
     }
 
     // Dessa metoder anropas via android:onClick i din layout
@@ -84,4 +87,5 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("TABLE_NUMBER", tableNumber);
         startActivity(intent);
     }
+
 }
