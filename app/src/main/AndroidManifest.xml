@@ -30,10 +30,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Order" />
+        <activity
+            android:name=".ReadyOrdersActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
-        <!-- Keep only one definition for ReadyOrdersActivity -->
-        <activity android:name=".ReadyOrdersActivity" />
+        <activity android:name=".Order" />
 
         <service android:name=".OrderMonitorService" />
 

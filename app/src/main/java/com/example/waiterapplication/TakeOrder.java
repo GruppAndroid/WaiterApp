@@ -7,6 +7,8 @@ import java.util.List;
 
 public class TakeOrder {
 
+    @SerializedName(value = "isFinished", alternate = {"complete", "is_finished"})
+    private Boolean complete;
     @SerializedName("tableNumber")
     private int table;
 
@@ -14,8 +16,6 @@ public class TakeOrder {
     List<OrderSpecs> orderSpecs;
 
 
-    @SerializedName("isFinished")
-    private Boolean complete;
 
     public TakeOrder(){ orderSpecs = new ArrayList<>();}
     public int getTable() {
