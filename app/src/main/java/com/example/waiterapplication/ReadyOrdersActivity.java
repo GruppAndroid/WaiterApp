@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -91,14 +94,16 @@ public class ReadyOrdersActivity extends AppCompatActivity {
             int tableNumber = getIntent().getIntExtra("TABLE_NUMBER", -1);
             Log.d(TAG, "Launched by kitchen - playing sound for table " + tableNumber);
             playNotificationSound();
+            vibrate();
         }
+
+
 
         // Fetch ready orders immediately
         fetchReadyOrders();
     }
 
-    // Add this method to ReadyOrdersActivity
-    // Add this method to ReadyOrdersActivity
+
     private void playNotificationSound() {
         try {
             // Make sure volume is up
@@ -142,6 +147,29 @@ public class ReadyOrdersActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "Error playing notification sound", e);
+        }
+    }
+
+    private void vibrate() {
+        try {
+            Log.d(TAG, "Attempting to vibrate device...");
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // For newer Android versions (Oreo and above)
+                    VibrationEffect effect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE);
+                    vibrator.vibrate(effect);
+                    Log.d(TAG, "Vibration triggered (new API)");
+                } else {
+                    // For older Android versions
+                    vibrator.vibrate(500);
+                    Log.d(TAG, "Vibration triggered (legacy API)");
+                }
+            } else {
+                Log.e(TAG, "Vibrator service not available");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error while trying to vibrate device", e);
         }
     }
 

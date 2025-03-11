@@ -5,9 +5,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -111,6 +114,7 @@ public class OrderMonitorService extends Service {
                     if (hasNewReadyOrders) {
                         Log.d(TAG, "New ready orders detected, playing notification");
                         playNotificationSound();  // Play sound
+                        vibrate();
 
                         // Only navigate if we're not already on the ReadyOrdersActivity
                         if (!isReadyOrdersActivityActive) {
@@ -183,6 +187,29 @@ public class OrderMonitorService extends Service {
         }
     }
 
+
+    private void vibrate() {
+        try {
+            Log.d(TAG, "Attempting to vibrate device...");
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // For newer Android versions (Oreo and above)
+                    VibrationEffect effect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE);
+                    vibrator.vibrate(effect);
+                    Log.d(TAG, "Vibration triggered (new API)");
+                } else {
+                    // For older Android versions
+                    vibrator.vibrate(500);
+                    Log.d(TAG, "Vibration triggered (legacy API)");
+                }
+            } else {
+                Log.e(TAG, "Vibrator service not available");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error while trying to vibrate device", e);
+        }
+    }
 
     @Override
     public void onDestroy() {
