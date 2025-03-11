@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.waiterapplication.api.ApiService;
 import com.example.waiterapplication.api.Retrofit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,25 +50,50 @@ public class ReadyOrdersAdapter extends RecyclerView.Adapter<ReadyOrdersAdapter.
         holder.tvTableNumber.setText("Bord: " + order.getTable());
 
         // Log order details for debugging
-        Log.d("ORDER_DEBUG", "Binding order: " + order.getTable());
+        Log.d("ORDER_DEBUG", "Binding order: " + order.getTable() +
+                " with " + (order.getOrderSpecs() != null ? order.getOrderSpecs().size() : 0) + " items");
 
         // Bygg en sträng med orderdetaljer
         StringBuilder details = new StringBuilder();
-        if (order.getOrderSpecs() != null) {
+        if (order.getOrderSpecs() != null && !order.getOrderSpecs().isEmpty()) {
+            // Group items by category
+            Map<String, List<OrderSpecs>> categorizedItems = new HashMap<>();
+
             for (OrderSpecs spec : order.getOrderSpecs()) {
-                details.append(spec.getMeal())
-                        .append(" (")
-                        .append(spec.getCount())
-                        .append(") - ")
-                        .append(spec.getCategory())
-                        .append("\n");
+                String category = spec.getCategory();
+                if (category == null || category.isEmpty()) {
+                    category = "Övrigt"; // Default category
+                }
+
+                if (!categorizedItems.containsKey(category)) {
+                    categorizedItems.put(category, new ArrayList<>());
+                }
+                categorizedItems.get(category).add(spec);
+            }
+
+            // Add each category with its items
+            for (String category : categorizedItems.keySet()) {
+                details.append(category).append(":\n");
+
+                for (OrderSpecs spec : categorizedItems.get(category)) {
+                    if (spec.getMeal() != null) {
+                        details.append(spec.getMeal())
+                                .append(" (")
+                                .append(spec.getCount())
+                                .append(")")
+                                .append("\n");
+                    }
+                }
+
+                details.append("\n");
             }
         } else {
             details.append("Inga detaljer tillgängliga.");
             Log.e("ORDER_DEBUG", "OrderSpecs är null för order: " + order.getTable());
         }
 
-        holder.tvOrderDetails.setText(details.toString());
+        holder.tvOrderDetails.setText(details.toString().trim());
+        holder.tvOrderDetails.setVisibility(View.VISIBLE);
 
         // När användaren trycker på knappen, markera ordern som levererad
         holder.btnDelivered.setOnClickListener(v -> {

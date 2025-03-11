@@ -198,14 +198,25 @@ public class ReadyOrdersActivity extends AppCompatActivity {
                     List<TakeOrder> newReadyOrders = response.body();
                     Log.d(TAG, "Fetched " + newReadyOrders.size() + " ready orders from API");
 
-                    // Log order details for debugging
+                    // Enhanced debugging - log detailed info about each order
                     for (TakeOrder order : newReadyOrders) {
                         Log.d(TAG, "Order for table " + order.getTable());
 
-                        if (order.getOrderSpecs() != null) {
-                            Log.d(TAG, "  Has " + order.getOrderSpecs().size() + " order specs");
+                        // Check if orderSpecs is null or empty
+                        if (order.getOrderSpecs() == null) {
+                            Log.e(TAG, "OrderSpecs is NULL for table " + order.getTable());
+                        } else if (order.getOrderSpecs().isEmpty()) {
+                            Log.e(TAG, "OrderSpecs is EMPTY for table " + order.getTable());
                         } else {
-                            Log.e(TAG, "  Order specs is NULL");
+                            Log.d(TAG, "Found " + order.getOrderSpecs().size() + " items for table " + order.getTable());
+
+                            // Log each dish in the order
+                            for (OrderSpecs spec : order.getOrderSpecs()) {
+                                Log.d(TAG, "  Item: " +
+                                        (spec.getMeal() != null ? spec.getMeal() : "NULL") +
+                                        ", Count: " + spec.getCount() +
+                                        ", Category: " + (spec.getCategory() != null ? spec.getCategory() : "NULL"));
+                            }
                         }
                     }
 
@@ -223,6 +234,15 @@ public class ReadyOrdersActivity extends AppCompatActivity {
                     }
                 } else {
                     Log.d(TAG, "No ready orders found or error code: " + response.code());
+
+                    // Log the error body if available
+                    if (response.errorBody() != null) {
+                        try {
+                            Log.e(TAG, "Error body: " + response.errorBody().string());
+                        } catch (Exception e) {
+                            Log.e(TAG, "Could not read error body", e);
+                        }
+                    }
 
                     // Update adapter with empty list
                     if (adapter != null) {
@@ -243,6 +263,8 @@ public class ReadyOrdersActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     // Debug method to print raw JSON - call this if you're having parsing issues
     private void debugJsonResponse() {
